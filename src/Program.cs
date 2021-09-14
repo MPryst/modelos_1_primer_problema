@@ -56,10 +56,10 @@ namespace primer_problema
 
 		private static void CleanClothes()
 		{
-			clothes = clothes.OrderBy(x => x.hoursToClean).ToList();
+			clothes = clothes.OrderByDescending(x => x.hoursToClean).ToList();
 			foreach (var cloth in clothes)
 			{
-				washes = washes.OrderBy(x => x.hoursToFinish).ToList();
+				washes = washes.OrderByDescending(x => x.clothes.Count).ToList();
 				if (!AddClothToWashes(cloth))
 					AddWash(cloth, washes.Count() + 1);
 			}
