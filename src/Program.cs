@@ -16,12 +16,11 @@ namespace primer_problema
 		private static List<Wash> washes = new List<Wash>();		
 		static void Main(string[] args)
 		{
-			string text = File.ReadAllText(PHISYCALL_INPUT_FILE);
-			foreach (string line in text.Split('\n'))
-			{
+			string inputText = File.ReadAllText(PHISYCALL_INPUT_FILE);
+			foreach (string line in inputText.Split('\n'))			
 				InterpretLine(line);
-			}
-			Clean();			
+			
+			CleanClothes();			
 			WriteWashedClothes();
 		}
 
@@ -30,7 +29,7 @@ namespace primer_problema
 			var characters = line.Split(" ");
 
 			if (characters[0] == "e")
-				AddException(long.Parse(characters[1]), long.Parse(characters[2]));
+				AddExceptionRule(long.Parse(characters[1]), long.Parse(characters[2]));
 
 			if (characters[0] == "n")
 				CreateCloth(long.Parse(characters[1]), long.Parse(characters[2]));
@@ -45,7 +44,7 @@ namespace primer_problema
 			});
 		}
 
-		private static void AddException(long A, long B)
+		private static void AddExceptionRule(long A, long B)
 		{
 			// Both are kept because they're not guaranteed 
 			if (!exceptions.ContainsKey(Tuple.Create(A, B)))
@@ -55,7 +54,7 @@ namespace primer_problema
 				exceptions.Add(Tuple.Create(B, A), true);
 		}
 
-		private static void Clean()
+		private static void CleanClothes()
 		{
 			foreach (var cloth in clothes)
 			{
