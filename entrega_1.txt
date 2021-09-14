@@ -1,0 +1,6 @@
+Impresion inicial del problema
+- Hay muchas incompatibilidades "e" y se van a tener que hacer muchas comparaciones
+
+• ideas de como lo van a intentar resolver
+- planeo cargar las incompatibilidades y prendas en memoria
+- luego leer las prendas e ir agregandolas al primer lavado que pueda (entendiendose como "pueda" a no tener prendas incompatibles en el, o siendo un lavado nuevo)
