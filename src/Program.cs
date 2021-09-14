@@ -12,44 +12,49 @@ namespace primer_problema
 		private const string PHISYCALL_OUTPUT = ""; // complete before running the program
 
 		private static Dictionary<Tuple<long, long>, Boolean> exceptions = new Dictionary<Tuple<long, long>, bool>();
-		private static List<Cloth> clothes;
-		private static List<WashedCloth> washedClothes = new List<WashedCloth>();
+		private static List<Cloth> clothes = new List<Cloth>();
 		private static List<Wash> washes = new List<Wash>();
+		private static List<WashedCloth> washedClothes = new List<WashedCloth>();
 		static void Main(string[] args)
 		{
 			string text = System.IO.File.ReadAllText(PHISYCALL_INPUT_FILE);
 			foreach (string line in text.Split('\n'))
 			{
-				ParseLine(line);
+				InterpretLine(line);
 			}
 			Clean();
-			PrintWashes();
+			GetWashedClothes();
+			WriteWashedClothes();
 		}
 
-		private static void ParseLine(string line)
+		private static void InterpretLine(string line)
 		{
-			var characters = line.Split(" ");			
+			var characters = line.Split(" ");
 
-			if (characters[0] == "e")
-			{
-				if (!exceptions.ContainsKey(Tuple.Create(long.Parse(characters[1]), long.Parse(characters[2]))))
-				{
-					exceptions.Add(Tuple.Create(long.Parse(characters[1]), long.Parse(characters[2])), true);
-				}
-				if (!exceptions.ContainsKey(Tuple.Create(long.Parse(characters[2]), long.Parse(characters[1]))))
-				{
-					exceptions.Add(Tuple.Create(long.Parse(characters[2]), long.Parse(characters[1])), true);
-				}
-			}
+			if (characters[0] == "e")							
+				AddException(long.Parse(characters[1]), long.Parse(characters[2]));
 
 			if (characters[0] == "n")
+				CreateCloth(long.Parse(characters[1]), long.Parse(characters[2]));			
+		}
+
+		private static void CreateCloth(long number, long hoursToClean)
+		{
+			clothes.Add(new Cloth()
 			{
-				clothes.Add(new Cloth()
-				{
-					number = long.Parse(characters[1]),
-					hoursToClean = long.Parse(characters[2])
-				});
-			}
+				number = number,
+				hoursToClean = hoursToClean
+			});
+		}
+
+		private static void AddException(long A, long B)
+		{
+			// Both are kept because they're not guaranteed 
+			if (!exceptions.ContainsKey(Tuple.Create(A, B)))
+				exceptions.Add(Tuple.Create(A, B), true);
+
+			if (!exceptions.ContainsKey(Tuple.Create(B, A)))
+				exceptions.Add(Tuple.Create(B, A), true);			
 		}
 
 		private static void Clean()
@@ -103,7 +108,7 @@ namespace primer_problema
 			return true;
 		}
 
-		private static void PrintWashes()
+		private static void GetWashedClothes()
 		{
 			foreach (var wash in washes)
 			{
@@ -116,14 +121,15 @@ namespace primer_problema
 					});
 				}
 			}
-			washedClothes.OrderBy(x => x.number);
+		}
 
+		private static void WriteWashedClothes()
+		{
 			using StreamWriter file = new StreamWriter(PHISYCALL_OUTPUT);
 
 			foreach (var washedCloth in washedClothes)
 			{
 				file.WriteLine($"{washedCloth.number} {washedCloth.numberOfWash}");
-				Console.WriteLine($"{washedCloth.number} {washedCloth.numberOfWash}");
 			}
 		}
 	}
