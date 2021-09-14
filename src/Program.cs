@@ -42,9 +42,14 @@ namespace primer_problema
 
 			if (characters[0] == "e")
 			{
-				exceptions.Add(Tuple.Create(long.Parse(characters[1]), long.Parse(characters[2])), true);
-				// TODO check the other way around
-				//exceptions.Add(Tuple.Create(long.Parse(characters[2]), long.Parse(characters[1])), true);				
+				if (!exceptions.ContainsKey(Tuple.Create(long.Parse(characters[1]), long.Parse(characters[2]))))
+				{
+					exceptions.Add(Tuple.Create(long.Parse(characters[1]), long.Parse(characters[2])), true);
+				}
+				if (!exceptions.ContainsKey(Tuple.Create(long.Parse(characters[2]), long.Parse(characters[1]))))
+				{
+					exceptions.Add(Tuple.Create(long.Parse(characters[2]), long.Parse(characters[1])), true);
+				}
 			}
 
 			if (characters[0] == "n")
