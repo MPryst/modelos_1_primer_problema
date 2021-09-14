@@ -13,14 +13,14 @@ namespace primer_problema
 
 		private static Dictionary<Tuple<long, long>, Boolean> exceptions = new Dictionary<Tuple<long, long>, bool>();
 		private static List<Cloth> clothes = new List<Cloth>();
-		private static List<Wash> washes = new List<Wash>();		
+		private static List<Wash> washes = new List<Wash>();
 		static void Main(string[] args)
 		{
 			string inputText = File.ReadAllText(PHISYCALL_INPUT_FILE);
-			foreach (string line in inputText.Split('\n'))			
+			foreach (string line in inputText.Split('\n'))
 				InterpretLine(line);
-			
-			CleanClothes();			
+
+			CleanClothes();
 			WriteWashedClothes();
 		}
 
@@ -56,8 +56,10 @@ namespace primer_problema
 
 		private static void CleanClothes()
 		{
+			clothes = clothes.OrderByDescending(x => x.hoursToClean).ToList();
 			foreach (var cloth in clothes)
 			{
+				washes = washes.OrderByDescending(x => x.hoursToFinish).ToList();
 				if (!AddClothToWashes(cloth))
 					AddWash(cloth, washes.Count() + 1);
 			}
@@ -68,6 +70,7 @@ namespace primer_problema
 			washes.Add(new Wash()
 			{
 				number = numberOfWash,
+				hoursToFinish = cloth.hoursToClean,
 				clothes = new List<Cloth>() { cloth }
 			});
 		}
@@ -79,6 +82,10 @@ namespace primer_problema
 				if (CanAddClothToWas(cloth, wash))
 				{
 					wash.clothes.Add(cloth);
+					if (cloth.hoursToClean > wash.hoursToFinish)
+					{
+						wash.hoursToFinish = cloth.hoursToClean;
+					}
 					return true;
 				}
 			}
@@ -89,8 +96,8 @@ namespace primer_problema
 		{
 			foreach (var washCloth in wash.clothes)
 			{
-				if (exceptions.ContainsKey(Tuple.Create(cloth.number, washCloth.number)))				
-					return false;				
+				if (exceptions.ContainsKey(Tuple.Create(cloth.number, washCloth.number)))
+					return false;
 			}
 			return true;
 		}
@@ -102,9 +109,9 @@ namespace primer_problema
 			{
 				foreach (var cloth in wash.clothes)
 				{
-					file.WriteLine($"{cloth.number} {wash.number}");					
+					file.WriteLine($"{cloth.number} {wash.number}");
 				}
 			}
-		}		
+		}
 	}
 }
