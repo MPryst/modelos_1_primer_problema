@@ -13,17 +13,15 @@ namespace primer_problema
 
 		private static Dictionary<Tuple<long, long>, Boolean> exceptions = new Dictionary<Tuple<long, long>, bool>();
 		private static List<Cloth> clothes = new List<Cloth>();
-		private static List<Wash> washes = new List<Wash>();
-		private static List<WashedCloth> washedClothes = new List<WashedCloth>();
+		private static List<Wash> washes = new List<Wash>();		
 		static void Main(string[] args)
 		{
-			string text = System.IO.File.ReadAllText(PHISYCALL_INPUT_FILE);
+			string text = File.ReadAllText(PHISYCALL_INPUT_FILE);
 			foreach (string line in text.Split('\n'))
 			{
 				InterpretLine(line);
 			}
-			Clean();
-			GetWashedClothes();
+			Clean();			
 			WriteWashedClothes();
 		}
 
@@ -31,11 +29,11 @@ namespace primer_problema
 		{
 			var characters = line.Split(" ");
 
-			if (characters[0] == "e")							
+			if (characters[0] == "e")
 				AddException(long.Parse(characters[1]), long.Parse(characters[2]));
 
 			if (characters[0] == "n")
-				CreateCloth(long.Parse(characters[1]), long.Parse(characters[2]));			
+				CreateCloth(long.Parse(characters[1]), long.Parse(characters[2]));
 		}
 
 		private static void CreateCloth(long number, long hoursToClean)
@@ -54,33 +52,25 @@ namespace primer_problema
 				exceptions.Add(Tuple.Create(A, B), true);
 
 			if (!exceptions.ContainsKey(Tuple.Create(B, A)))
-				exceptions.Add(Tuple.Create(B, A), true);			
+				exceptions.Add(Tuple.Create(B, A), true);
 		}
 
 		private static void Clean()
 		{
 			foreach (var cloth in clothes)
 			{
-				if (!washes.Any())
-				{
-					washes.Add(new Wash()
-					{
-						number = 1,
-						clothes = new List<Cloth>() { cloth }
-					});
-				}
-				else
-				{
-					if (!AddClothToWashes(cloth))
-					{
-						washes.Add(new Wash()
-						{
-							number = washes.Count() + 1,
-							clothes = new List<Cloth>() { cloth }
-						});
-					}
-				}
+				if (!AddClothToWashes(cloth))
+					AddWash(cloth, washes.Count() + 1);
 			}
+		}
+
+		private static void AddWash(Cloth cloth, long numberOfWash = 1)
+		{
+			washes.Add(new Wash()
+			{
+				number = numberOfWash,
+				clothes = new List<Cloth>() { cloth }
+			});
 		}
 
 		private static bool AddClothToWashes(Cloth cloth)
@@ -98,39 +88,24 @@ namespace primer_problema
 
 		private static bool CanAddClothToWas(Cloth cloth, Wash wash)
 		{
-			foreach (var element in wash.clothes)
+			foreach (var washCloth in wash.clothes)
 			{
-				if (exceptions.ContainsKey(Tuple.Create(cloth.number, element.number)))
-				{
-					return false;
-				}
+				if (exceptions.ContainsKey(Tuple.Create(cloth.number, washCloth.number)))				
+					return false;				
 			}
 			return true;
-		}
-
-		private static void GetWashedClothes()
-		{
-			foreach (var wash in washes)
-			{
-				foreach (var cloth in wash.clothes)
-				{
-					washedClothes.Add(new WashedCloth()
-					{
-						number = cloth.number,
-						numberOfWash = wash.number
-					});
-				}
-			}
 		}
 
 		private static void WriteWashedClothes()
 		{
 			using StreamWriter file = new StreamWriter(PHISYCALL_OUTPUT);
-
-			foreach (var washedCloth in washedClothes)
+			foreach (var wash in washes)
 			{
-				file.WriteLine($"{washedCloth.number} {washedCloth.numberOfWash}");
+				foreach (var cloth in wash.clothes)
+				{
+					file.WriteLine($"{cloth.number} {wash.number}");					
+				}
 			}
-		}
+		}		
 	}
 }
