@@ -1,4 +1,5 @@
-﻿using System;
+﻿using primer_problema.DTOs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,8 +10,7 @@ namespace primer_problema
 	{
 		private const string PHISYCALL_INPUT_FILE = "";// complete before running the program
 		private const string PHISYCALL_OUTPUT = ""; // complete before running the program
-		private static long clothesNumber;
-		private static long exceptionsNumber;
+
 		private static Dictionary<Tuple<long, long>, Boolean> exceptions = new Dictionary<Tuple<long, long>, bool>();
 		private static List<Cloth> clothes;
 		private static List<WashedCloth> washedClothes = new List<WashedCloth>();
@@ -22,23 +22,13 @@ namespace primer_problema
 			{
 				ParseLine(line);
 			}
-			clothes = clothes.OrderByDescending(c => c.hoursToClean).ToList();
 			Clean();
 			PrintWashes();
 		}
 
 		private static void ParseLine(string line)
 		{
-			var characters = line.Split(" ");
-			if (characters[0] == "c")
-				return;
-
-			if (characters[0] == "p")
-			{
-				clothesNumber = long.Parse(characters[2]);
-				exceptionsNumber = long.Parse(characters[3]);
-				clothes = new List<Cloth>();
-			}
+			var characters = line.Split(" ");			
 
 			if (characters[0] == "e")
 			{
@@ -111,24 +101,6 @@ namespace primer_problema
 				}
 			}
 			return true;
-		}
-
-		public class Cloth
-		{
-			public long number { get; set; }
-			public long hoursToClean { get; set; }
-		}
-
-		public class WashedCloth
-		{
-			public long number { get; set; }
-			public long numberOfWash { get; set; }
-		}
-
-		public class Wash
-		{
-			public long number { get; set; }
-			public List<Cloth> clothes { get; set; }
 		}
 
 		private static void PrintWashes()
