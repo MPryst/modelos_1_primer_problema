@@ -10,7 +10,7 @@ namespace primer_problema
 	{
 		private const string PHISYCALL_INPUT_FILE = "";// complete before running the program
 		private const string PHISYCALL_OUTPUT = ""; // complete before running the program
-		private const int NUMBER_TO_CALCULATE = 11;
+		private const int NUMBER_TO_CALCULATE = 10;
 
 		private static Dictionary<Tuple<long, long>, Boolean> exceptions = new Dictionary<Tuple<long, long>, bool>();
 		private static List<Cloth> clothes = new List<Cloth>();

@@ -4,9 +4,18 @@
 
 • Ideas de como lo van a intentar resolver
 - Planeo cargar las incompatibilidades y prendas en memoria.
-- Luego leer las prendas e ir agregandolas al primer lavado que pueda (entendiendose como "pueda" a no tener prendas incompatibles en el, o siendo un lavado nuevo).
+- Luego leer las prendas e ir agregandolas al primer lavado que pueda (entendiendose como "pueda" a no tener prendas incompatibles en él, o siendo un lavado nuevo).
 
-
-- Como mejora, a las entidades de Ropa (Cloth) se le agregó el atributo de "horas para "
+• Comentarios sobre los cambios que hagan en el codigo
+- Como mejora, a las entidades de Ropa (Cloth) y Lavado (Wash) se les agregó el atributo de "horas para terminar". Asi se pueden ordenar e intentar poner las ropas que tarden más en los lavados que tarden mas.
+- Otra alternativa/intento de mejora fue ordenar los lavados por cantidad de ropa, para tratar de poner muchas prendas en el mismo lavado.
+- Otra alternativa/intento de mejora fue ordenar las prendas por cantidad de incompatibilidades, para ubicar primero las mas incompatibles.
+- La última alternativa fue tomar todas las combinaciones de lavados e intentar agregarlos (con la lógica de que si no se puede por incompatibilidad, ir a los siguientes o crear uno nuevo).
+Esto es un problema de O(n!), y n = 20 ya es un número atronómico. Por lo que se implementó una alternativa híbrida:
+	- Primero agregan k = 10 prendas, ordenadas descendentes por cantidad de restricciones en este caso (podría ser por horas para lavar, etc)
+	- Se las agrega a los lavados (iterando sobre ellos, o creando uno nuevo)
+	- Se toman las n-k = 10 prendas restantes y se prueba el algoritmo anterior de agregado para cada combinación
 
 • Comentarios finales
+La solución propuesta es O(n!), pero se hizo una aproximación usando 10 elementos para las combinaciones, porque usando los 20, el factorial es un número astronómico.
+El mejor resultado encontrado es 61. Algo notable es que hay muchas alternativas que llegan a ese valor. Si se probaran todas las combinaciones podría afirmarse que es el mejor resultado, pero computacionalmente no es viable.
