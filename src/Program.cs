@@ -10,18 +10,29 @@ namespace primer_problema
 	{
 		private const string PHISYCALL_INPUT_FILE = "";// complete before running the program
 		private const string PHISYCALL_OUTPUT = ""; // complete before running the program
+		private const int NUMBER_TO_CALCULATE = 11;
 
 		private static Dictionary<Tuple<long, long>, Boolean> exceptions = new Dictionary<Tuple<long, long>, bool>();
 		private static List<Cloth> clothes = new List<Cloth>();
 		private static List<Wash> washes = new List<Wash>();
+		private static List<Wash> partialWashes = new List<Wash>();
 		static void Main(string[] args)
 		{
 			string inputText = File.ReadAllText(PHISYCALL_INPUT_FILE);
 			foreach (string line in inputText.Split('\n'))
 				InterpretLine(line);
 
-			CleanClothes();
-			WriteWashedClothes();
+			InitializeClothes();
+			CleanClothes();			
+		}
+
+		private static void InitializeClothes()
+		{
+			foreach (var element in exceptions)
+			{
+				var first = clothes.Where(x => x.number == element.Key.Item1).FirstOrDefault();				
+				first.numberOfRestrictions++;				
+			}
 		}
 
 		private static void InterpretLine(string line)
@@ -56,13 +67,76 @@ namespace primer_problema
 
 		private static void CleanClothes()
 		{
-			clothes = clothes.OrderByDescending(x => x.hoursToClean).ToList();
-			foreach (var cloth in clothes)
+			SortClothes();
+			partialWashes = washes;
+			List<IEnumerable<int>> permutations = GetPermutations(Enumerable.Range(1, NUMBER_TO_CALCULATE), NUMBER_TO_CALCULATE).ToList();
+
+
+			var currentWashList = washes.Select(x => new Wash(x)).ToList();
+			var best = currentWashList.Select(x => new Wash(x)).ToList();
+			long hoursCurrent = 0;
+			long hoursbest = 99999;
+			var bestElement = permutations[0];
+			foreach (var element in permutations)
+			{
+				for (int i = 0; i < clothes.Count - NUMBER_TO_CALCULATE; i++)
+				{
+					washes = washes.OrderByDescending(x => x.clothes.Count).ToList();
+					if (!AddClothToWashes(clothes[i]))
+						AddWash(clothes[i], washes.Count() + 1);
+				}
+
+				currentWashList = GetWashingOrder(element.ToList(), NUMBER_TO_CALCULATE);
+				hoursCurrent = HoursToWash(currentWashList);
+
+
+				if (hoursCurrent < hoursbest)
+				{
+					best = currentWashList.ToList();
+					hoursbest = hoursCurrent;
+					bestElement = element;
+				}
+				washes.Clear();
+			}
+
+			SortClothes();
+			for (int i = 0; i < clothes.Count - NUMBER_TO_CALCULATE; i++)
 			{
 				washes = washes.OrderByDescending(x => x.clothes.Count).ToList();
-				if (!AddClothToWashes(cloth))
-					AddWash(cloth, washes.Count() + 1);
+				if (!AddClothToWashes(clothes[i]))
+					AddWash(clothes[i], washes.Count() + 1);
 			}
+
+			washes = GetWashingOrder(bestElement.ToList(), NUMBER_TO_CALCULATE);
+			WriteWashedClothes();
+		}
+
+		private static long HoursToWash(List<Wash> currentWashList)
+		{
+			long hourstoWash = 0;
+			foreach (var element in currentWashList)
+			{
+				hourstoWash += element.hoursToFinish;
+			}
+			return hourstoWash;
+		}
+
+		private static List<Wash> GetWashingOrder(List<int> elements, int offset)
+		{
+			SortClothes();
+			for (int i = 0; i < elements.Count(); i++)
+			{
+				int index = clothes.Count() - offset + elements[i] - 1;
+				if (!AddClothToWashes(clothes[index]))
+					AddWash(clothes[index], washes.Count() + 1);
+
+			}
+			return washes;
+		}
+
+		public static void SortClothes()
+		{
+			clothes = clothes.OrderByDescending(x => x.numberOfRestrictions).ToList();
 		}
 
 		private static void AddWash(Cloth cloth, long numberOfWash = 1)
@@ -112,6 +186,15 @@ namespace primer_problema
 					file.WriteLine($"{cloth.number} {wash.number}");
 				}
 			}
+		}
+
+		static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
+		{
+			if (length == 1) return list.Select(t => new T[] { t });
+
+			return GetPermutations(list, length - 1)
+				.SelectMany(t => list.Where(e => !t.Contains(e)),
+					(t1, t2) => t1.Concat(new T[] { t2 }));
 		}
 	}
 }
